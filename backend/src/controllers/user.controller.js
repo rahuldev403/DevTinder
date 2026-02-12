@@ -1,6 +1,7 @@
 import Match from "../models/match.model.js";
 import User from "../models/user.model.js";
 import bcrypt from "bcrypt";
+import generateCompatibility from "../services/ai.service.js";
 
 export const getMe = async (req, res) => {
   try {
@@ -202,9 +203,19 @@ export const swipeUser = async (req, res) => {
         });
 
         if (!existingMatch) {
-          await Match.create({
+          const match = await Match.create({
             users: [req.userId, targetUserId],
           });
+
+          const compatibility = await generateCompatibility(
+            req.userId,
+            targetUserId,
+          );
+
+          match.compatibilityScore = compatibility.score;
+          match.compatibilitySummary = compatibility.summary;
+
+          await match.save();
         }
 
         return res.status(200).json({
