@@ -50,4 +50,45 @@ const generateCompatibility = async (userA, userB) => {
   return JSON.parse(content);
 };
 
+// Fire-and-forget: Generate compatibility without blocking response
+export const generateCompatibilityAsync = (match, io, userA, userB) => {
+  // Don't await - let it run in background
+  (async () => {
+    try {
+      const compatibility = await generateCompatibility(userA, userB);
+
+      match.compatibilityScore = compatibility.score;
+      match.compatibilitySummary = compatibility.summary;
+
+      await match.save();
+
+      const matchId = match._id.toString();
+
+      // Emit to all relevant parties
+      io.to(matchId).emit("compatibility-ready", {
+        matchId,
+        compatibilityScore: compatibility.score,
+        compatibilitySummary: compatibility.summary,
+      });
+
+      io.to(match.users[0].toString()).emit("compatibility-ready", {
+        matchId,
+        compatibilityScore: compatibility.score,
+        compatibilitySummary: compatibility.summary,
+      });
+
+      io.to(match.users[1].toString()).emit("compatibility-ready", {
+        matchId,
+        compatibilityScore: compatibility.score,
+        compatibilitySummary: compatibility.summary,
+      });
+
+      console.log(`✅ Compatibility generated for match ${matchId}`);
+    } catch (error) {
+      console.error("❌ AI compatibility generation failed:", error.message);
+      // Silently fail - don't interrupt user experience
+    }
+  })();
+};
+
 export default generateCompatibility;

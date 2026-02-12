@@ -1,7 +1,9 @@
 import Match from "../models/match.model.js";
 import User from "../models/user.model.js";
 import bcrypt from "bcrypt";
-import generateCompatibility from "../services/ai.service.js";
+import generateCompatibility, {
+  generateCompatibilityAsync,
+} from "../services/ai.service.js";
 import Connection from "../models/connection.model.js";
 import { getIO } from "../socket.js";
 
@@ -60,10 +62,11 @@ export const updateProfile = async (req, res) => {
         message: "Invalid updates detected",
       });
     }
-    const user = await User.findByIdAndUpdate(req.userId, updates, {
+    const user = await User.findByIdAndUpdate(req.userId, req.body, {
       new: true,
       runValidators: true,
     }).select("-password -refreshToken");
+
     res.status(200).json({
       message: "Profile updated",
       user,
@@ -140,7 +143,7 @@ export const getFeed = async (req, res) => {
     });
 
     const matchedUserIds = matches.map((match) =>
-      match.users.find((id) => id.toString() != req.userId),
+      match.users.find((id) => id.toString() !== req.userId),
     );
 
     const connections = await Connection.find({
@@ -292,9 +295,9 @@ export const getMyMatches = async (req, res) => {
       .populate("users", "-password -refreshToken")
       .sort({ createdAt: -1 });
 
-    const fromattedMatches = matches.map((match) => {
+    const formattedMatches = matches.map((match) => {
       const otherUsers = match.users.find(
-        (user) => user._id.toString() != req.userId,
+        (user) => user._id.toString() !== req.userId,
       );
 
       return {
@@ -306,8 +309,8 @@ export const getMyMatches = async (req, res) => {
       };
     });
     res.status(200).json({
-      count: fromattedMatches.length,
-      matches: fromattedMatches,
+      count: formattedMatches.length,
+      matches: formattedMatches,
     });
   } catch (error) {
     res.status(500).json({
@@ -347,6 +350,7 @@ export const respondToRequest = async (req, res) => {
     }
 
     connection.status = action;
+    
     await connection.save();
 
     if (action == "ACCEPTED") {
@@ -354,18 +358,6 @@ export const respondToRequest = async (req, res) => {
         users: [connection.sender, connection.receiver],
       });
       const matchId = match._id;
-      const senderUser = await User.findById(connection.sender);
-      const receiverUser = await User.findById(connection.receiver);
-
-      const compatibility = await generateCompatibility(
-        senderUser,
-        receiverUser,
-      );
-
-      match.compatibilityScore = compatibility.score;
-      match.compatibilitySummary = compatibility.summary;
-
-      await match.save();
       const io = getIO();
 
       io.to(connection.sender.toString()).emit("connection-accepted", {
@@ -373,9 +365,31 @@ export const respondToRequest = async (req, res) => {
         byUser: req.userId,
       });
 
+      // Fire and forget: AI compatibility runs in background via service
+      try {
+        const senderUser = await User.findById(connection.sender);
+        const receiverUser = await User.findById(connection.receiver);
+
+        // Non-blocking: doesn't wait for AI response
+        generateCompatibilityAsync(match, io, senderUser, receiverUser);
+      } catch (error) {
+        console.error("Failed to initiate AI compatibility:", error.message);
+        // Continue - connection is still successful
+      }
+
       res.status(200).json({
         message: `Request ${action.toLowerCase()}`,
         matchId,
+      });
+    } else if (action == "REJECTED") {
+      const io = getIO();
+
+      io.to(connection.sender.toString()).emit("connection-rejected", {
+        byUser: req.userId,
+      });
+
+      res.status(200).json({
+        message: "Request rejected",
       });
     }
   } catch (error) {
