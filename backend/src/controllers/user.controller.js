@@ -237,3 +237,35 @@ export const swipeUser = async (req, res) => {
 };
 
 //get match feild
+
+export const getMyMatches = async (req, res) => {
+  try {
+    const matches = await Match.find({
+      users: req.userId,
+    })
+      .populate("users", "-password refreshToken")
+      .sort({ createdAt: -1 });
+
+    const fromattedMatches = matches.map((match) => {
+      const otherUsers = match.find(
+        (user) => user._id.toString() != req.userId,
+      );
+
+      return {
+        matchId: match._id,
+        user: otherUsers,
+        compatibilityScore: match.compatibilityScore,
+        compatibilitySummary: match.compatibilitySummary,
+        createdAt: match.createdAt,
+      };
+    });
+    res.status(200).json({
+      count: fromattedMatches.length,
+      matches: fromattedMatches,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Server error",
+    });
+  }
+};
