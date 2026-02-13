@@ -205,29 +205,63 @@ html {
   color-scheme: light;
 }
 
+/* Sidebar fix for large screens */
+@media (min-width: 1024px) {
+  aside[class*="lg:static"] {
+    transform: translateX(0) !important;
+  }
+}
+
 /* Custom pixelated scrollbar */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--muted);
+  border: 2px solid var(--border);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border: 2px solid var(--border);
+  transition: all 0.2s;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+  opacity: 0.8;
+}
+
+/* Custom class for specific scrollbars */
 .custom-scrollbar::-webkit-scrollbar {
   width: 12px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: hsl(var(--muted));
-  border: 2px solid hsl(var(--border));
+  background: var(--muted);
+  border: 2px solid var(--border);
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: hsl(var(--primary));
-  border: 2px solid hsl(var(--border));
+  background: var(--primary);
+  border: 2px solid var(--border);
   transition: all 0.2s;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--primary) / 0.8);
-  border: 2px solid hsl(var(--primary));
+  background: var(--primary);
+  opacity: 0.8;
 }
 
 /* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary) var(--muted);
+}
+
 .custom-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: hsl(var(--primary)) hsl(var(--muted));
+  scrollbar-color: var(--primary) var(--muted);
 }

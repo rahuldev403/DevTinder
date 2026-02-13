@@ -156,8 +156,8 @@ const Chat = () => {
         </div>
       ) : null}
 
-      {/* Chat container with fixed height */}
-      <div className="flex h-[calc(100vh-240px)] flex-col">
+      {/* Chat container - full height layout */}
+      <div className="flex h-[calc(100vh-120px)] flex-col gap-4">
         {/* Messages area - scrollable */}
         <Card className="flex-1 border-4 border-primary shadow-xl overflow-hidden">
           <CardContent className="custom-scrollbar h-full overflow-y-auto p-6 flex flex-col gap-3">

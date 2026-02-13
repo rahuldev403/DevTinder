@@ -67,7 +67,7 @@ const Requests = () => {
             size="sm"
             disabled={page === 1}
             onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-            className="border-2 border-border font-mono font-bold shadow-sm hover:shadow-md"
+            className="border-2 border-border font-mono font-bold shadow-sm"
           >
             ← Prev
           </Button>
@@ -76,7 +76,7 @@ const Requests = () => {
             size="sm"
             disabled={page >= totalPages}
             onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
-            className="border-2 border-border font-mono font-bold shadow-sm hover:shadow-md"
+            className="border-2 border-border font-mono font-bold shadow-sm"
           >
             Next →
           </Button>
@@ -127,12 +127,12 @@ const Requests = () => {
           {requests.map((request) => (
             <Card
               key={request._id}
-              className="border-4 border-primary shadow-xl transition-all hover:shadow-2xl hover:translate-x-[-2px] hover:translate-y-[-2px]"
+              className="border-4 border-primary shadow-xl"
             >
-              <CardContent className="flex flex-col gap-4 p-6">
-                <div className="flex items-center gap-4">
+              <CardContent className="flex flex-col gap-3 p-4">
+                <div className="flex items-center gap-3">
                   <div
-                    className="h-16 w-16 flex-shrink-0 overflow-hidden border-4 border-primary bg-primary/20 shadow-md"
+                    className="h-12 w-12 flex-shrink-0 overflow-hidden border-4 border-primary bg-primary/20 shadow-md"
                     style={{ imageRendering: "pixelated" }}
                   >
                     {request.sender?.avatar ? (
@@ -149,34 +149,34 @@ const Requests = () => {
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-mono text-lg font-bold text-foreground truncate">
+                    <h3 className="font-mono text-base font-bold text-foreground truncate">
                       {request.sender?.name || "Unknown"}
                     </h3>
-                    <div className="mt-1 inline-block border-2 border-accent bg-accent/20 px-2 py-1 font-mono text-xs font-semibold text-accent-foreground">
+                    <div className="mt-0.5 inline-block border-2 border-accent bg-accent/20 px-2 py-0.5 font-mono text-xs font-semibold text-accent-foreground">
                       {request.sender?.experienceLevel || ""}
                     </div>
                   </div>
                 </div>
 
                 {request.sender?.bio ? (
-                  <div className="border-l-4 border-accent pl-3 font-mono text-sm leading-relaxed text-muted-foreground">
+                  <div className="border-l-4 border-accent pl-2 font-mono text-xs leading-snug text-muted-foreground">
                     "{request.sender.bio}"
                   </div>
                 ) : null}
 
-                <div className="flex flex-wrap gap-3">
+                <div className="flex flex-wrap gap-2">
                   <Button
                     variant="secondary"
                     disabled={actingOn === request._id}
                     onClick={() => handleRespond(request._id, "REJECTED")}
-                    className="flex-1 border-4 border-border font-mono text-base font-bold shadow-lg transition-all hover:shadow-xl hover:translate-x-[-1px] hover:translate-y-[-1px] disabled:opacity-50"
+                    className="flex-1 border-4 border-border font-mono text-sm font-bold shadow-lg disabled:opacity-50"
                   >
                     ✗ Reject
                   </Button>
                   <Button
                     disabled={actingOn === request._id}
                     onClick={() => handleRespond(request._id, "ACCEPTED")}
-                    className="flex-1 border-4 border-border font-mono text-base font-bold shadow-lg transition-all hover:shadow-xl hover:translate-x-[-1px] hover:translate-y-[-1px] disabled:opacity-50"
+                    className="flex-1 border-4 border-border font-mono text-sm font-bold shadow-lg disabled:opacity-50">
                   >
                     ✓ Accept
                   </Button>

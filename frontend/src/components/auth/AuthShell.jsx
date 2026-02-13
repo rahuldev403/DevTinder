@@ -12,9 +12,12 @@ const AuthShell = ({ title, description, children, footer }) => {
       <div className="mx-auto flex min-h-screen w-full max-w-md items-center px-4 py-10">
         <Card className="w-full border-4 border-primary shadow-2xl">
           <CardHeader className="space-y-2 border-b-4 border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5">
-            <div className="mb-2 font-mono text-xs font-bold uppercase tracking-wider text-primary">
-              &lt;DevTinder/&gt;
-            </div>
+            <img
+              src="/codecursh.png"
+              alt="CodeCrush"
+              className="mb-2 h-12 w-auto"
+              style={{ imageRendering: "pixelated" }}
+            />
             <CardTitle className="font-mono text-2xl font-bold">
               {title}
             </CardTitle>

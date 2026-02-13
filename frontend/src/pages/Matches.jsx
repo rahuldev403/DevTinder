@@ -86,12 +86,12 @@ const Matches = () => {
           {matches.map((match) => (
             <Card
               key={match.matchId}
-              className="border-4 border-primary shadow-xl transition-all hover:shadow-2xl hover:translate-x-[-2px] hover:translate-y-[-2px]"
+              className="border-4 border-primary shadow-xl"
             >
-              <CardContent className="space-y-4 p-6">
-                <div className="flex items-center gap-4">
+              <CardContent className="space-y-3 p-4">
+                <div className="flex items-center gap-3">
                   <div
-                    className="h-16 w-16 flex-shrink-0 overflow-hidden border-4 border-primary bg-primary/20 shadow-md"
+                    className="h-12 w-12 flex-shrink-0 overflow-hidden border-4 border-primary bg-primary/20 shadow-md"
                     style={{ imageRendering: "pixelated" }}
                   >
                     {match.user?.avatar ? (
@@ -108,10 +108,10 @@ const Matches = () => {
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-mono text-lg font-bold text-foreground truncate">
+                    <h3 className="font-mono text-base font-bold text-foreground truncate">
                       {match.user?.name || "Unknown"}
                     </h3>
-                    <div className="mt-1 inline-block border-2 border-accent bg-accent/20 px-2 py-1 font-mono text-xs font-semibold text-accent-foreground">
+                    <div className="mt-0.5 inline-block border-2 border-accent bg-accent/20 px-2 py-0.5 font-mono text-xs font-semibold text-accent-foreground">
                       {match.user?.experienceLevel || ""}
                     </div>
                   </div>
@@ -136,17 +136,16 @@ const Matches = () => {
                 </div>
 
                 {match.compatibilitySummary ? (
-                  <div className="border-l-4 border-accent pl-3 font-mono text-xs leading-relaxed text-muted-foreground">
+                  <div className="border-l-4 border-accent pl-2 font-mono text-xs leading-snug text-muted-foreground">
                     {match.compatibilitySummary}
                   </div>
                 ) : null}
 
-                <Button
-                  asChild
-                  className="w-full border-4 border-border font-mono text-base font-bold shadow-lg transition-all hover:shadow-xl hover:translate-x-[-1px] hover:translate-y-[-1px]"
-                >
-                  <Link to={`/chat/${match.matchId}`}>Open chat →</Link>
-                </Button>
+                <Link to={`/chat/${match.matchId}`}>
+                  <Button className="w-full border-4 border-border font-mono text-sm font-bold shadow-lg">
+                    Open chat →
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
           ))}

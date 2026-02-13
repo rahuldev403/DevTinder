@@ -213,12 +213,40 @@ export const getFeed = async (req, res) => {
       .skip(skip)
       .limit(limit);
 
+    // Fetch GitHub data for each user
+    const usersWithGithubData = await Promise.all(
+      feedUsers.map(async (user) => {
+        const userObj = user.toObject();
+
+        if (userObj.githubLink) {
+          const username = userObj.githubLink
+            .split("github.com/")[1]
+            ?.split("/")[0];
+
+          if (username) {
+            try {
+              const response = await fetch(
+                `https://api.github.com/users/${username}`,
+              );
+              if (response.ok) {
+                userObj.githubData = await response.json();
+              }
+            } catch (error) {
+              
+            }
+          }
+        }
+
+        return userObj;
+      }),
+    );
+
     res.status(200).json({
       page,
       limit,
       totalUsers,
       totalPages: Math.ceil(totalUsers / limit),
-      users: feedUsers,
+      users: usersWithGithubData,
     });
   } catch (error) {
     res.status(500).json({

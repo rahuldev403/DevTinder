@@ -18,9 +18,6 @@ const Feed = () => {
   const [isSwiping, setIsSwiping] = useState(false);
   const [error, setError] = useState("");
   const [totalPages, setTotalPages] = useState(1);
-  const [githubPreview, setGithubPreview] = useState(null);
-  const [githubLoading, setGithubLoading] = useState(false);
-  const [githubError, setGithubError] = useState("");
 
   const currentProfile = useMemo(() => feed[0], [feed]);
 
@@ -50,65 +47,6 @@ const Feed = () => {
       isMounted = false;
     };
   }, [page]);
-
-  useEffect(() => {
-    let isMounted = true;
-    const githubLink = currentProfile?.githubLink;
-    if (!githubLink) {
-      setGithubPreview(null);
-      setGithubError("");
-      return () => {
-        isMounted = false;
-      };
-    }
-
-    const username = githubLink.split("github.com/")[1]?.split("/")[0];
-    if (!username) {
-      setGithubPreview(null);
-      setGithubError("Invalid GitHub link");
-      return () => {
-        isMounted = false;
-      };
-    }
-
-    const controller = new AbortController();
-    setGithubLoading(true);
-    setGithubError("");
-
-    fetch(`https://api.github.com/users/${username}`, {
-      signal: controller.signal,
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to load GitHub profile");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        if (!isMounted) return;
-        setGithubPreview({
-          name: data.name || data.login,
-          avatar: data.avatar_url,
-          followers: data.followers,
-          following: data.following,
-          repos: data.public_repos,
-          url: data.html_url,
-          bio: data.bio,
-        });
-      })
-      .catch((err) => {
-        if (!isMounted || err.name === "AbortError") return;
-        setGithubError(err.message || "Failed to load GitHub profile");
-      })
-      .finally(() => {
-        if (isMounted) setGithubLoading(false);
-      });
-
-    return () => {
-      isMounted = false;
-      controller.abort();
-    };
-  }, [currentProfile?.githubLink]);
 
   const handleSwipe = async (action) => {
     if (!currentProfile) return;
@@ -155,10 +93,10 @@ const Feed = () => {
           </CardContent>
         </Card>
       ) : currentProfile ? (
-        <Card className="mx-auto max-w-xl border-4 border-primary bg-card shadow-xl transition-all hover:shadow-2xl hover:translate-x-[-2px] hover:translate-y-[-2px]">
-          <CardHeader className="space-y-5 border-b-4 border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5">
-            <div className="flex items-center gap-5">
-              <div className="relative h-20 w-20 overflow-hidden border-4 border-primary bg-primary/20 shadow-md">
+        <Card className="mx-auto max-w-lg border-4 border-primary bg-card shadow-xl">
+          <CardHeader className="space-y-3 border-b-4 border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5 p-4">
+            <div className="flex items-center gap-3">
+              <div className="relative h-14 w-14 overflow-hidden border-4 border-primary bg-primary/20 shadow-md">
                 {currentProfile.avatar ? (
                   <img
                     src={currentProfile.avatar}
@@ -173,34 +111,34 @@ const Feed = () => {
                 )}
               </div>
               <div className="flex-1">
-                <h2 className="text-2xl font-bold tracking-tight text-foreground font-mono">
+                <h2 className="text-xl font-bold tracking-tight text-foreground font-mono">
                   {currentProfile.name}
                 </h2>
-                <div className="mt-2 inline-block border-2 border-accent bg-accent/20 px-3 py-1 font-mono text-sm font-semibold text-accent-foreground">
+                <div className="mt-1 inline-block border-2 border-accent bg-accent/20 px-2 py-0.5 font-mono text-xs font-semibold text-accent-foreground">
                   {currentProfile.experienceLevel}
                 </div>
               </div>
             </div>
             {currentProfile.bio ? (
-              <div className="border-l-4 border-accent pl-4 font-mono text-sm leading-relaxed text-muted-foreground">
+              <div className="border-l-4 border-accent pl-3 font-mono text-xs leading-snug text-muted-foreground">
                 "{currentProfile.bio}"
               </div>
             ) : null}
           </CardHeader>
-          <CardContent className="space-y-6 p-6">
+          <CardContent className="space-y-4 p-4">
             <div>
-              <div className="mb-3 flex items-center gap-2 border-b-2 border-primary pb-2">
+              <div className="mb-2 flex items-center gap-2 border-b-2 border-primary pb-1">
                 <span className="font-mono text-xs font-bold uppercase tracking-wider text-primary">
                   ▸ Skills
                 </span>
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1.5">
                 {currentProfile.skills?.length ? (
                   currentProfile.skills.map((skill, index) => (
                     <Badge
                       key={skill}
                       variant="secondary"
-                      className="border-2 border-border font-mono text-xs font-semibold shadow-sm transition-all hover:shadow-md hover:translate-x-[-1px] hover:translate-y-[-1px]"
+                      className="border-2 border-border font-mono text-xs font-semibold shadow-sm"
                       style={{
                         animationDelay: `${index * 50}ms`,
                       }}
@@ -216,8 +154,8 @@ const Feed = () => {
               </div>
             </div>
 
-            <div className="border-2 border-muted bg-muted/20 p-3">
-              <span className="font-mono text-sm font-semibold text-foreground">
+            <div className="border-2 border-muted bg-muted/20 p-2">
+              <span className="font-mono text-xs font-semibold text-foreground">
                 📅 Availability:{" "}
                 <span className="text-primary">
                   {formatAvailability(currentProfile.availability)}
@@ -225,76 +163,70 @@ const Feed = () => {
               </span>
             </div>
 
-            {currentProfile.githubLink ? (
-              <div className="border-4 border-accent bg-gradient-to-br from-accent/10 to-accent/5 p-5 shadow-lg">
-                <div className="mb-3 flex items-center gap-2">
-                  <span className="font-mono text-sm font-bold text-accent">
+            {currentProfile.githubLink && currentProfile.githubData ? (
+              <div className="border-4 border-accent bg-gradient-to-br from-accent/10 to-accent/5 p-3 shadow-lg">
+                <div className="mb-2 flex items-center gap-2">
+                  <span className="font-mono text-xs font-bold text-accent">
                     {"{ GitHub Profile }"}
                   </span>
                 </div>
-                {githubLoading ? (
-                  <p className="font-mono text-sm text-muted-foreground animate-pulse">
-                    Loading GitHub preview...
-                  </p>
-                ) : githubError ? (
-                  <p className="font-mono text-sm text-destructive">
-                    {githubError}
-                  </p>
-                ) : githubPreview ? (
-                  <div className="flex items-start gap-4">
-                    <div
-                      className="h-14 w-14 flex-shrink-0 overflow-hidden border-4 border-accent bg-accent/20"
+                <div className="flex items-start gap-3">
+                  <div
+                    className="h-10 w-10 flex-shrink-0 overflow-hidden border-4 border-accent bg-accent/20"
+                    style={{ imageRendering: "pixelated" }}
+                  >
+                    <img
+                      src={currentProfile.githubData.avatar_url}
+                      alt={
+                        currentProfile.githubData.name ||
+                        currentProfile.githubData.login
+                      }
+                      className="h-full w-full object-cover"
                       style={{ imageRendering: "pixelated" }}
-                    >
-                      <img
-                        src={githubPreview.avatar}
-                        alt={githubPreview.name}
-                        className="h-full w-full object-cover"
-                        style={{ imageRendering: "pixelated" }}
-                      />
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-3">
+                      <span className="font-mono font-bold text-foreground">
+                        {currentProfile.githubData.name ||
+                          currentProfile.githubData.login}
+                      </span>
+                      <a
+                        href={currentProfile.githubData.html_url}
+                        className="inline-flex items-center border-2 border-accent bg-accent px-2 py-1 font-mono text-xs font-bold text-accent-foreground shadow-sm"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        View →
+                      </a>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex flex-wrap items-center gap-3">
-                        <span className="font-mono font-bold text-foreground">
-                          {githubPreview.name}
-                        </span>
-                        <a
-                          href={githubPreview.url}
-                          className="inline-flex items-center border-2 border-accent bg-accent px-2 py-1 font-mono text-xs font-bold text-accent-foreground shadow-sm transition-all hover:shadow-md hover:translate-x-[-1px] hover:translate-y-[-1px]"
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          View →
-                        </a>
-                      </div>
-                      {githubPreview.bio ? (
-                        <p className="mt-2 font-mono text-xs leading-relaxed text-muted-foreground">
-                          {githubPreview.bio}
-                        </p>
-                      ) : null}
-                      <div className="mt-3 flex flex-wrap gap-4 font-mono text-xs">
-                        <span className="text-foreground">
-                          <span className="font-bold text-primary">
-                            {githubPreview.repos}
-                          </span>{" "}
-                          repos
-                        </span>
-                        <span className="text-foreground">
-                          <span className="font-bold text-primary">
-                            {githubPreview.followers}
-                          </span>{" "}
-                          followers
-                        </span>
-                        <span className="text-foreground">
-                          <span className="font-bold text-primary">
-                            {githubPreview.following}
-                          </span>{" "}
-                          following
-                        </span>
-                      </div>
+                    {currentProfile.githubData.bio ? (
+                      <p className="mt-2 font-mono text-xs leading-relaxed text-muted-foreground">
+                        {currentProfile.githubData.bio}
+                      </p>
+                    ) : null}
+                    <div className="mt-3 flex flex-wrap gap-4 font-mono text-xs">
+                      <span className="text-foreground">
+                        <span className="font-bold text-primary">
+                          {currentProfile.githubData.public_repos}
+                        </span>{" "}
+                        repos
+                      </span>
+                      <span className="text-foreground">
+                        <span className="font-bold text-primary">
+                          {currentProfile.githubData.followers}
+                        </span>{" "}
+                        followers
+                      </span>
+                      <span className="text-foreground">
+                        <span className="font-bold text-primary">
+                          {currentProfile.githubData.following}
+                        </span>{" "}
+                        following
+                      </span>
                     </div>
                   </div>
-                ) : null}
+                </div>
               </div>
             ) : null}
 
@@ -304,7 +236,7 @@ const Feed = () => {
                 type="button"
                 disabled={isSwiping}
                 onClick={() => handleSwipe("left")}
-                className="flex-1 border-4 border-border font-mono text-base font-bold shadow-lg transition-all hover:shadow-xl hover:translate-x-[-1px] hover:translate-y-[-1px] disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 border-4 border-border font-mono text-base font-bold shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 ← SKIP
               </Button>
@@ -312,7 +244,7 @@ const Feed = () => {
                 type="button"
                 disabled={isSwiping}
                 onClick={() => handleSwipe("right")}
-                className="flex-1 border-4 border-border font-mono text-base font-bold shadow-lg transition-all hover:shadow-xl hover:translate-x-[-1px] hover:translate-y-[-1px] disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 border-4 border-border font-mono text-base font-bold shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 CONNECT →
               </Button>

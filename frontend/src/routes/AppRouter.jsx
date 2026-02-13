@@ -1,4 +1,5 @@
 import { Navigate, Route, Routes } from "react-router-dom";
+import Landing from "@/pages/Landing";
 import Login from "@/pages/auth/Login";
 import Register from "@/pages/auth/Register";
 import Onboarding from "@/pages/Onboarding";
@@ -11,7 +12,7 @@ import Profile from "@/pages/Profile";
 const AppRouter = () => {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/login" replace />} />
+      <Route path="/" element={<Landing />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/onboarding" element={<Onboarding />} />
@@ -20,7 +21,7 @@ const AppRouter = () => {
       <Route path="/matches" element={<Matches />} />
       <Route path="/chat/:matchId" element={<Chat />} />
       <Route path="/profile" element={<Profile />} />
-      <Route path="*" element={<Navigate to="/login" replace />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 };
