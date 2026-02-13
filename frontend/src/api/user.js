@@ -10,8 +10,10 @@ export const updateProfile = async (payload) => {
   return data;
 };
 
-export const getAvatarSignature = async () => {
-  const { data } = await apiClient.get("/user/avatar/signature");
+export const getAvatarSignature = async (style = "face") => {
+  const { data } = await apiClient.get("/user/avatar/signature", {
+    params: { style },
+  });
   return data;
 };
 

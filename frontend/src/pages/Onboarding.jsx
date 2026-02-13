@@ -26,6 +26,24 @@ const availabilityOptions = [
   { value: "HACKATHON", label: "Hackathon" },
 ];
 
+const avatarCropOptions = [
+  {
+    value: "face",
+    label: "Face crop",
+    description: "Auto-focus on faces",
+  },
+  {
+    value: "center",
+    label: "Center crop",
+    description: "Crop from the center",
+  },
+  {
+    value: "fit",
+    label: "Fit",
+    description: "Fit inside a square",
+  },
+];
+
 const MAX_AVATAR_MB = 2;
 const MAX_AVATAR_BYTES = MAX_AVATAR_MB * 1024 * 1024;
 const MAX_CANVAS_SIZE = 512;
@@ -95,6 +113,7 @@ const Onboarding = () => {
   const [skillInput, setSkillInput] = useState("");
   const [avatarPreview, setAvatarPreview] = useState("");
   const [avatarDataUrl, setAvatarDataUrl] = useState("");
+  const [avatarCrop, setAvatarCrop] = useState("face");
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -201,8 +220,8 @@ const Onboarding = () => {
   };
 
   const uploadAvatarToCloudinary = async (dataUrl) => {
-    const { timestamp, signature, folder, apiKey, cloudName } =
-      await getAvatarSignature();
+    const { timestamp, signature, folder, apiKey, cloudName, transformation } =
+      await getAvatarSignature(avatarCrop);
 
     const formData = new FormData();
     formData.append("file", dataUrlToBlob(dataUrl));
@@ -210,6 +229,7 @@ const Onboarding = () => {
     formData.append("timestamp", timestamp);
     formData.append("signature", signature);
     formData.append("folder", folder);
+    formData.append("transformation", transformation);
 
     const response = await fetch(
       `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
@@ -395,6 +415,28 @@ const Onboarding = () => {
                     value={form.githubLink}
                     onChange={handleFieldChange("githubLink")}
                   />
+                </div>
+                <div className="space-y-2">
+                  <Label>Avatar crop style</Label>
+                  <Select value={avatarCrop} onValueChange={setAvatarCrop}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select crop" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {avatarCropOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">
+                    {
+                      avatarCropOptions.find(
+                        (option) => option.value === avatarCrop,
+                      )?.description
+                    }
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="avatarFile">Avatar upload</Label>

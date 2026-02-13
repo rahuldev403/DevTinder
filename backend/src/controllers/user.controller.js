@@ -8,12 +8,25 @@ import Connection from "../models/connection.model.js";
 import { getIO } from "../socket.js";
 import cloudinary from "../config/cloudinary.js";
 
+const avatarTransformations = {
+  face: "c_fill,g_face,w_512,h_512,q_auto,f_auto",
+  center: "c_fill,g_center,w_512,h_512,q_auto,f_auto",
+  fit: "c_fit,w_512,h_512,q_auto,f_auto",
+};
+
 export const getAvatarUploadSignature = async (req, res) => {
   try {
+    const style = req.query.style || "face";
+    const transformation = avatarTransformations[style];
+    if (!transformation) {
+      return res.status(400).json({
+        message: "Invalid avatar crop style",
+      });
+    }
     const timestamp = Math.round(Date.now() / 1000);
     const folder = "devtinder/avatars";
     const signature = cloudinary.utils.api_sign_request(
-      { timestamp, folder },
+      { timestamp, folder, transformation },
       process.env.CLOUDINARY_API_SECRET,
     );
 
@@ -21,6 +34,7 @@ export const getAvatarUploadSignature = async (req, res) => {
       timestamp,
       signature,
       folder,
+      transformation,
       cloudName: process.env.CLOUDINARY_CLOUD_NAME,
       apiKey: process.env.CLOUDINARY_API_KEY,
     });
@@ -346,8 +360,14 @@ export const getMyMatches = async (req, res) => {
 
 export const respondToRequest = async (req, res) => {
   try {
-    const { requestId } = req.params;
+    const requestId = req.params.requestId || req.body.requestId;
     const { action } = req.body;
+
+    if (!requestId) {
+      return res.status(400).json({
+        message: "Request ID is required",
+      });
+    }
 
     if (!["ACCEPTED", "REJECTED"].includes(action)) {
       return res.status(400).json({
