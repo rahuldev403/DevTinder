@@ -10,6 +10,11 @@ export const updateProfile = async (payload) => {
   return data;
 };
 
+export const getAvatarSignature = async () => {
+  const { data } = await apiClient.get("/user/avatar/signature");
+  return data;
+};
+
 export const updatePassword = async (payload) => {
   const { data } = await apiClient.patch("/user/me/password", payload);
   return data;

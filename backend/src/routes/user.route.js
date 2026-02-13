@@ -1,6 +1,7 @@
 import express from "express";
 import {
   getFeed,
+  getAvatarUploadSignature,
   getMe,
   getMyMatches,
   getReceivedRequests,
@@ -24,6 +25,7 @@ const userRoute = express.Router();
 userRoute.get("/me", protect, getMe);
 userRoute.patch("/me", protect, updateProfile);
 userRoute.patch("/me/password", protect, updatePassword);
+userRoute.get("/avatar/signature", protect, getAvatarUploadSignature);
 userRoute.get("/feed", protect, getFeed);
 userRoute.post("/swipe", protect, swipeLimiter, swipeUser);
 userRoute.get("/matches", protect, getMyMatches);
