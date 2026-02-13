@@ -37,7 +37,6 @@ export const chatSocket = (io) => {
   io.on("connection", (socket) => {
     socket.join(socket.userId);
 
-    console.log("user connected:", socket.userId);
     onlineUsers.set(socket.userId, socket.id);
 
     io.emit("user-online", socket.userId);
@@ -64,7 +63,6 @@ export const chatSocket = (io) => {
         online: isotherOnline,
       });
       socket.join(matchId);
-      console.log("joined room", matchId);
     });
 
     //typing indecators - typing also for stop typing
@@ -126,11 +124,15 @@ export const chatSocket = (io) => {
         content,
       });
 
-      io.to(matchId).emit("receive-message", message); // It's just in-memory grouping.
+      const populatedMessage = await Messages.findById(message._id).populate(
+        "senderId",
+        "name avatar",
+      );
+
+      io.to(matchId).emit("receive-message", populatedMessage); // It's just in-memory grouping.
     });
     // This event triggers when user disconnects from socket
     socket.on("disconnect", () => {
-      console.log("User disconnected!");
       onlineUsers.delete(socket.userId);
 
       io.emit("user-offline", socket.userId);

@@ -73,7 +73,8 @@ const userSchema = new mongoose.Schema(
 
     avatar: {
       type: String,
-      default: "",
+      default:
+        "https://i.pinimg.com/474x/c0/84/76/c08476bddd9b396d5519e92a251c5875.jpg",
     },
   },
   { timestamps: true },

@@ -39,17 +39,22 @@ const Register = () => {
       title="Create your profile"
       description="Start matching with developers who share your goals."
       footer={
-        <p className="text-sm text-muted-foreground">
+        <p className="font-mono text-sm text-muted-foreground">
           Already have an account?{" "}
-          <Link className="text-primary hover:underline" to="/login">
-            Sign in
+          <Link
+            className="border-b-2 border-primary font-bold text-primary hover:bg-primary/10"
+            to="/login"
+          >
+            Sign in →
           </Link>
         </p>
       }
     >
       <form className="space-y-4" onSubmit={handleSubmit}>
         <div className="space-y-2">
-          <Label htmlFor="name">Name</Label>
+          <Label htmlFor="name" className="font-mono font-bold text-foreground">
+            Name
+          </Label>
           <Input
             id="name"
             name="name"
@@ -59,10 +64,16 @@ const Register = () => {
             value={form.name}
             onChange={handleChange}
             required
+            className="border-4 border-border font-mono shadow-md"
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
+          <Label
+            htmlFor="email"
+            className="font-mono font-bold text-foreground"
+          >
+            Email
+          </Label>
           <Input
             id="email"
             name="email"
@@ -72,10 +83,16 @@ const Register = () => {
             value={form.email}
             onChange={handleChange}
             required
+            className="border-4 border-border font-mono shadow-md"
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="password">Password</Label>
+          <Label
+            htmlFor="password"
+            className="font-mono font-bold text-foreground"
+          >
+            Password
+          </Label>
           <Input
             id="password"
             name="password"
@@ -85,11 +102,20 @@ const Register = () => {
             value={form.password}
             onChange={handleChange}
             required
+            className="border-4 border-border font-mono shadow-md"
           />
         </div>
-        {error ? <p className="text-sm text-destructive">{error}</p> : null}
-        <Button className="w-full" type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Creating..." : "Create account"}
+        {error ? (
+          <div className="border-4 border-destructive bg-destructive/10 p-3 font-mono text-sm text-destructive shadow-lg">
+            ⚠ {error}
+          </div>
+        ) : null}
+        <Button
+          className="w-full border-4 border-border font-mono text-base font-bold shadow-lg hover:shadow-xl hover:translate-x-[-1px] hover:translate-y-[-1px]"
+          type="submit"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? "Creating..." : "Create account →"}
         </Button>
       </form>
     </AuthShell>
