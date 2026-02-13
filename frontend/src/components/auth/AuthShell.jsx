@@ -13,7 +13,7 @@ const AuthShell = ({ title, description, children, footer }) => {
         <Card className="w-full border-4 border-primary shadow-2xl">
           <CardHeader className="space-y-2 border-b-4 border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5">
             <img
-              src="/codecursh.png"
+              src="/codecrush-text.png"
               alt="CodeCrush"
               className="mb-2 h-12 w-auto"
               style={{ imageRendering: "pixelated" }}
