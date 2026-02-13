@@ -155,8 +155,14 @@ const Feed = () => {
             </div>
 
             <div className="border-2 border-muted bg-muted/20 p-2">
-              <span className="font-mono text-xs font-semibold text-foreground">
-                📅 Availability:{" "}
+              <span className="font-mono text-xs font-semibold text-foreground flex items-center gap-2">
+                <img
+                  src="/calendar.png"
+                  alt="Calendar"
+                  className="h-4 w-4 inline-block"
+                  style={{ imageRendering: "pixelated" }}
+                />
+                Availability:{" "}
                 <span className="text-primary">
                   {formatAvailability(currentProfile.availability)}
                 </span>

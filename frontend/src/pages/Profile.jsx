@@ -288,9 +288,9 @@ const Profile = () => {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
+        <div className="grid gap-4 lg:grid-cols-[2fr_1fr]">
           <Card className="border-4 border-primary shadow-xl">
-            <CardContent className="space-y-6 p-6">
+            <CardContent className="space-y-4 p-6">
               <div className="space-y-2">
                 <Label
                   htmlFor="bio"
@@ -480,18 +480,36 @@ const Profile = () => {
                   type="button"
                   onClick={handleSaveProfile}
                   disabled={isSaving}
-                  className="w-full border-4 border-border font-mono text-base font-bold shadow-lg hover:shadow-xl hover:translate-x-[-1px] hover:translate-y-[-1px]"
+                  className="w-full border-4 border-border font-mono text-base font-bold shadow-lg hover:shadow-xl hover:translate-x-[-1px] hover:translate-y-[-1px] flex items-center justify-center gap-2"
                 >
-                  {isSaving ? "Saving..." : "💾 Save profile"}
+                  {isSaving ? (
+                    "Saving..."
+                  ) : (
+                    <>
+                      <img
+                        src="/save.png"
+                        alt="Save"
+                        className="h-5 w-5"
+                        style={{ imageRendering: "pixelated" }}
+                      />
+                      Save profile
+                    </>
+                  )}
                 </Button>
               </CardContent>
             </Card>
 
             <Card className="border-4 border-secondary shadow-xl">
-              <CardContent className="space-y-4 p-6">
+              <CardContent className="space-y-3 p-6">
                 <div className="mb-2 border-b-2 border-primary pb-2">
-                  <span className="font-mono text-sm font-bold uppercase text-primary">
-                    🔒 Security
+                  <span className="font-mono text-sm font-bold uppercase text-primary flex items-center gap-2">
+                    <img
+                      src="/sheild.png"
+                      alt="Security"
+                      className="h-4 w-4"
+                      style={{ imageRendering: "pixelated" }}
+                    />
+                    Security
                   </span>
                 </div>
                 <div className="space-y-2">
@@ -539,9 +557,21 @@ const Profile = () => {
                   variant="secondary"
                   onClick={handlePasswordChange}
                   disabled={isUpdatingPassword}
-                  className="w-full border-4 border-border font-mono text-base font-bold shadow-lg hover:shadow-xl hover:translate-x-[-1px] hover:translate-y-[-1px]"
+                  className="w-full border-4 border-border font-mono text-base font-bold shadow-lg hover:shadow-xl hover:translate-x-[-1px] hover:translate-y-[-1px] flex items-center justify-center gap-2"
                 >
-                  {isUpdatingPassword ? "Updating..." : "🔑 Change password"}
+                  {isUpdatingPassword ? (
+                    "Updating..."
+                  ) : (
+                    <>
+                      <img
+                        src="/key.png"
+                        alt="Key"
+                        className="h-5 w-5"
+                        style={{ imageRendering: "pixelated" }}
+                      />
+                      Change password
+                    </>
+                  )}
                 </Button>
               </CardContent>
             </Card>

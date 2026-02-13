@@ -113,7 +113,14 @@ const Requests = () => {
       ) : requests.length === 0 ? (
         <Card className="border-4 border-muted shadow-xl">
           <CardContent className="py-12 text-center">
-            <div className="mb-4 text-6xl">📭</div>
+            <div className="mb-4 flex justify-center">
+              <img 
+                src="/postbox.png" 
+                alt="Empty postbox" 
+                className="h-24 w-24"
+                style={{ imageRendering: "pixelated" }}
+              />
+            </div>
             <p className="font-mono text-base font-semibold text-muted-foreground">
               // No pending requests right now
             </p>
