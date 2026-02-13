@@ -24,7 +24,9 @@ export const getMessages = async (req, res) => {
       });
     }
 
-    const messages = await Messages.find({ matchId }).sort({ createdAt: 1 });
+    const messages = await Messages.find({ matchId })
+      .populate("senderId", "name avatar")
+      .sort({ createdAt: 1 });
 
     res.status(200).json({
       count: messages.length,

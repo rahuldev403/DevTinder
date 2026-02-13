@@ -268,45 +268,65 @@ const Profile = () => {
       title="Profile"
       subtitle="Keep your profile up to date for better matches."
     >
-      {error ? <p className="mb-4 text-sm text-destructive">{error}</p> : null}
+      {error ? (
+        <div className="mb-4 border-4 border-destructive bg-destructive/10 p-4 font-mono text-sm text-destructive shadow-lg">
+          ⚠ {error}
+        </div>
+      ) : null}
       {success ? (
-        <p className="mb-4 text-sm text-emerald-500">{success}</p>
+        <div className="mb-4 border-4 border-primary bg-primary/10 p-4 font-mono text-sm text-primary shadow-lg">
+          ✓ {success}
+        </div>
       ) : null}
 
       {isLoading ? (
-        <Card>
-          <CardContent className="py-10 text-center text-sm text-muted-foreground">
-            Loading profile...
+        <Card className="border-4 border-muted shadow-xl">
+          <CardContent className="py-12 text-center">
+            <p className="font-mono text-base text-muted-foreground animate-pulse">
+              Loading profile...
+            </p>
           </CardContent>
         </Card>
       ) : (
         <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
-          <Card>
+          <Card className="border-4 border-primary shadow-xl">
             <CardContent className="space-y-6 p-6">
               <div className="space-y-2">
-                <Label htmlFor="bio">Bio</Label>
+                <Label
+                  htmlFor="bio"
+                  className="font-mono font-bold text-foreground"
+                >
+                  Bio
+                </Label>
                 <Textarea
                   id="bio"
                   value={form.bio}
                   onChange={handleFieldChange("bio")}
                   rows={4}
+                  className="border-4 border-border font-mono shadow-md"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label>Skills</Label>
+                <Label className="font-mono font-bold text-foreground">
+                  Skills
+                </Label>
                 <div className="flex flex-wrap gap-2">
                   {form.skills.length === 0 ? (
-                    <span className="text-sm text-muted-foreground">
-                      No skills added.
+                    <span className="font-mono text-sm text-muted-foreground">
+                      // No skills added
                     </span>
                   ) : (
                     form.skills.map((skill) => (
-                      <Badge key={skill} variant="secondary">
+                      <Badge
+                        key={skill}
+                        variant="secondary"
+                        className="border-2 border-border font-mono text-xs font-semibold shadow-sm"
+                      >
                         {skill}
                         <button
                           type="button"
-                          className="ml-2 text-xs text-muted-foreground hover:text-foreground"
+                          className="ml-2 text-xs font-bold hover:text-destructive"
                           onClick={() => handleRemoveSkill(skill)}
                         >
                           ×
@@ -320,30 +340,38 @@ const Profile = () => {
                     placeholder="Add a skill"
                     value={skillInput}
                     onChange={(event) => setSkillInput(event.target.value)}
+                    className="border-4 border-border font-mono shadow-md"
                   />
                   <Button
                     type="button"
                     variant="secondary"
                     onClick={handleAddSkill}
+                    className="border-4 border-border font-mono font-bold shadow-lg hover:shadow-xl"
                   >
-                    Add
+                    + Add
                   </Button>
                 </div>
               </div>
 
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label>Experience level</Label>
+                  <Label className="font-mono font-bold text-foreground">
+                    Experience level
+                  </Label>
                   <Select
                     value={form.experienceLevel}
                     onValueChange={handleSelectChange("experienceLevel")}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="border-4 border-border font-mono shadow-md">
                       <SelectValue placeholder="Select level" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="border-4 border-border font-mono shadow-xl">
                       {experienceOptions.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
+                        <SelectItem
+                          key={option.value}
+                          value={option.value}
+                          className="font-mono"
+                        >
                           {option.label}
                         </SelectItem>
                       ))}
@@ -351,17 +379,23 @@ const Profile = () => {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Availability</Label>
+                  <Label className="font-mono font-bold text-foreground">
+                    Availability
+                  </Label>
                   <Select
                     value={form.availability}
                     onValueChange={handleSelectChange("availability")}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="border-4 border-border font-mono shadow-md">
                       <SelectValue placeholder="Select availability" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="border-4 border-border font-mono shadow-xl">
                       {availabilityOptions.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
+                        <SelectItem
+                          key={option.value}
+                          value={option.value}
+                          className="font-mono"
+                        >
                           {option.label}
                         </SelectItem>
                       ))}
@@ -371,48 +405,71 @@ const Profile = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="githubLink">GitHub profile</Label>
+                <Label
+                  htmlFor="githubLink"
+                  className="font-mono font-bold text-foreground"
+                >
+                  GitHub profile
+                </Label>
                 <Input
                   id="githubLink"
                   type="url"
                   value={form.githubLink}
                   onChange={handleFieldChange("githubLink")}
+                  className="border-4 border-border font-mono shadow-md"
                 />
               </div>
             </CardContent>
           </Card>
 
           <div className="space-y-6">
-            <Card>
+            <Card className="border-4 border-accent shadow-xl">
               <CardContent className="space-y-4 p-6">
                 <div className="space-y-2">
-                  <Label>Avatar</Label>
+                  <Label className="font-mono font-bold text-foreground">
+                    Avatar
+                  </Label>
                   <div className="flex items-center gap-4">
-                    <div className="h-20 w-20 overflow-hidden rounded-full bg-muted">
+                    <div
+                      className="h-20 w-20 overflow-hidden border-4 border-primary bg-primary/20 shadow-md"
+                      style={{ imageRendering: "pixelated" }}
+                    >
                       {avatarPreview ? (
                         <img
                           src={avatarPreview}
                           alt="Avatar"
                           className="h-full w-full object-cover"
+                          style={{ imageRendering: "pixelated" }}
                         />
-                      ) : null}
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center font-mono text-2xl font-bold text-primary">
+                          ?
+                        </div>
+                      )}
                     </div>
                     <Input
                       type="file"
                       accept="image/*"
                       onChange={handleAvatarFile}
+                      className="border-4 border-border font-mono text-xs shadow-md"
                     />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label>Avatar crop style</Label>
+                  <Label className="font-mono font-bold text-foreground">
+                    Avatar crop style
+                  </Label>
                   <Select value={avatarCrop} onValueChange={setAvatarCrop}>
-                    <SelectTrigger>
+                    <SelectTrigger className="border-4 border-border font-mono shadow-md">
                       <SelectValue placeholder="Select crop" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="border-4 border-border font-mono shadow-xl">
                       {avatarCropOptions.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
+                        <SelectItem
+                          key={option.value}
+                          value={option.value}
+                          className="font-mono"
+                        >
                           {option.label}
                         </SelectItem>
                       ))}
@@ -423,16 +480,27 @@ const Profile = () => {
                   type="button"
                   onClick={handleSaveProfile}
                   disabled={isSaving}
+                  className="w-full border-4 border-border font-mono text-base font-bold shadow-lg hover:shadow-xl hover:translate-x-[-1px] hover:translate-y-[-1px]"
                 >
-                  {isSaving ? "Saving..." : "Save profile"}
+                  {isSaving ? "Saving..." : "💾 Save profile"}
                 </Button>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="border-4 border-secondary shadow-xl">
               <CardContent className="space-y-4 p-6">
+                <div className="mb-2 border-b-2 border-primary pb-2">
+                  <span className="font-mono text-sm font-bold uppercase text-primary">
+                    🔒 Security
+                  </span>
+                </div>
                 <div className="space-y-2">
-                  <Label htmlFor="currentPassword">Current password</Label>
+                  <Label
+                    htmlFor="currentPassword"
+                    className="font-mono font-bold text-foreground"
+                  >
+                    Current password
+                  </Label>
                   <Input
                     id="currentPassword"
                     type="password"
@@ -443,10 +511,16 @@ const Profile = () => {
                         currentPassword: event.target.value,
                       }))
                     }
+                    className="border-4 border-border font-mono shadow-md"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="newPassword">New password</Label>
+                  <Label
+                    htmlFor="newPassword"
+                    className="font-mono font-bold text-foreground"
+                  >
+                    New password
+                  </Label>
                   <Input
                     id="newPassword"
                     type="password"
@@ -457,6 +531,7 @@ const Profile = () => {
                         newPassword: event.target.value,
                       }))
                     }
+                    className="border-4 border-border font-mono shadow-md"
                   />
                 </div>
                 <Button
@@ -464,8 +539,9 @@ const Profile = () => {
                   variant="secondary"
                   onClick={handlePasswordChange}
                   disabled={isUpdatingPassword}
+                  className="w-full border-4 border-border font-mono text-base font-bold shadow-lg hover:shadow-xl hover:translate-x-[-1px] hover:translate-y-[-1px]"
                 >
-                  {isUpdatingPassword ? "Updating..." : "Change password"}
+                  {isUpdatingPassword ? "Updating..." : "🔑 Change password"}
                 </Button>
               </CardContent>
             </Card>

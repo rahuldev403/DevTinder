@@ -58,7 +58,7 @@ const Requests = () => {
       title="Connection Requests"
       subtitle="Review incoming requests and decide who to match with."
       actions={
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <div className="flex items-center gap-2 font-mono text-sm text-muted-foreground">
           <span>
             Page {page} of {totalPages}
           </span>
@@ -67,91 +67,118 @@ const Requests = () => {
             size="sm"
             disabled={page === 1}
             onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+            className="border-2 border-border font-mono font-bold shadow-sm hover:shadow-md"
           >
-            Prev
+            ← Prev
           </Button>
           <Button
             variant="ghost"
             size="sm"
             disabled={page >= totalPages}
             onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
+            className="border-2 border-border font-mono font-bold shadow-sm hover:shadow-md"
           >
-            Next
+            Next →
           </Button>
         </div>
       }
     >
-      {error ? <p className="mb-4 text-sm text-destructive">{error}</p> : null}
+      {error ? (
+        <div className="mb-4 border-4 border-destructive bg-destructive/10 p-4 font-mono text-sm text-destructive shadow-lg">
+          ⚠ {error}
+        </div>
+      ) : null}
 
       {isLoading ? (
-        <Card>
+        <Card className="border-4 border-primary shadow-xl">
           <CardContent className="grid gap-4 py-8 sm:grid-cols-2">
             {[1, 2, 3, 4].map((item) => (
               <div
                 key={item}
-                className="rounded-xl border border-border/60 p-4 space-y-3"
+                className="border-4 border-muted p-4 space-y-3 shadow-md"
               >
                 <div className="flex items-center gap-3">
-                  <div className="h-12 w-12 rounded-full bg-muted/60 animate-pulse" />
+                  <div className="h-14 w-14 border-4 border-primary bg-primary/20 animate-pulse" />
                   <div className="space-y-2">
-                    <div className="h-3 w-28 rounded bg-muted/60 animate-pulse" />
-                    <div className="h-3 w-16 rounded bg-muted/60 animate-pulse" />
+                    <div className="h-4 w-28 border-2 border-muted bg-muted/60 animate-pulse" />
+                    <div className="h-3 w-16 border-2 border-muted bg-muted/60 animate-pulse" />
                   </div>
                 </div>
-                <div className="h-3 w-full rounded bg-muted/60 animate-pulse" />
-                <div className="h-8 w-32 rounded bg-muted/50 animate-pulse" />
+                <div className="h-3 w-full border-2 border-muted bg-muted/60 animate-pulse" />
+                <div className="h-10 w-32 border-2 border-muted bg-muted/50 animate-pulse" />
               </div>
             ))}
           </CardContent>
         </Card>
       ) : requests.length === 0 ? (
-        <Card>
-          <CardContent className="py-10 text-center text-sm text-muted-foreground">
-            No pending requests right now.
+        <Card className="border-4 border-muted shadow-xl">
+          <CardContent className="py-12 text-center">
+            <div className="mb-4 text-6xl">📭</div>
+            <p className="font-mono text-base font-semibold text-muted-foreground">
+              // No pending requests right now
+            </p>
+            <p className="mt-2 font-mono text-sm text-muted-foreground/60">
+              Check back later!
+            </p>
           </CardContent>
         </Card>
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
           {requests.map((request) => (
-            <Card key={request._id}>
+            <Card
+              key={request._id}
+              className="border-4 border-primary shadow-xl transition-all hover:shadow-2xl hover:translate-x-[-2px] hover:translate-y-[-2px]"
+            >
               <CardContent className="flex flex-col gap-4 p-6">
-                <div className="flex items-center gap-3">
-                  <div className="h-12 w-12 overflow-hidden rounded-full bg-muted">
+                <div className="flex items-center gap-4">
+                  <div
+                    className="h-16 w-16 flex-shrink-0 overflow-hidden border-4 border-primary bg-primary/20 shadow-md"
+                    style={{ imageRendering: "pixelated" }}
+                  >
                     {request.sender?.avatar ? (
                       <img
                         src={request.sender.avatar}
                         alt={request.sender.name}
                         className="h-full w-full object-cover"
+                        style={{ imageRendering: "pixelated" }}
                       />
-                    ) : null}
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center font-mono text-2xl font-bold text-primary">
+                        {request.sender?.name?.charAt(0)?.toUpperCase() || "?"}
+                      </div>
+                    )}
                   </div>
-                  <div>
-                    <h3 className="text-lg font-semibold">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-mono text-lg font-bold text-foreground truncate">
                       {request.sender?.name || "Unknown"}
                     </h3>
-                    <p className="text-sm text-muted-foreground">
+                    <div className="mt-1 inline-block border-2 border-accent bg-accent/20 px-2 py-1 font-mono text-xs font-semibold text-accent-foreground">
                       {request.sender?.experienceLevel || ""}
-                    </p>
+                    </div>
                   </div>
                 </div>
+
                 {request.sender?.bio ? (
-                  <p className="text-sm text-muted-foreground">
-                    {request.sender.bio}
-                  </p>
+                  <div className="border-l-4 border-accent pl-3 font-mono text-sm leading-relaxed text-muted-foreground">
+                    "{request.sender.bio}"
+                  </div>
                 ) : null}
-                <div className="flex flex-wrap gap-2">
+
+                <div className="flex flex-wrap gap-3">
                   <Button
                     variant="secondary"
                     disabled={actingOn === request._id}
                     onClick={() => handleRespond(request._id, "REJECTED")}
+                    className="flex-1 border-4 border-border font-mono text-base font-bold shadow-lg transition-all hover:shadow-xl hover:translate-x-[-1px] hover:translate-y-[-1px] disabled:opacity-50"
                   >
-                    Reject
+                    ✗ Reject
                   </Button>
                   <Button
                     disabled={actingOn === request._id}
                     onClick={() => handleRespond(request._id, "ACCEPTED")}
+                    className="flex-1 border-4 border-border font-mono text-base font-bold shadow-lg transition-all hover:shadow-xl hover:translate-x-[-1px] hover:translate-y-[-1px] disabled:opacity-50"
                   >
-                    Accept
+                    ✓ Accept
                   </Button>
                 </div>
               </CardContent>
