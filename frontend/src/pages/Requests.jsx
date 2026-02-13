@@ -47,7 +47,7 @@ const Requests = () => {
     try {
       await respondToRequest(requestId, action);
       setRequests((prev) => prev.filter((req) => req._id !== requestId));
-      
+
       if (action === "accept") {
         toast.success("Request accepted! 🎉", {
           description: "You've made a new connection",
@@ -60,7 +60,8 @@ const Requests = () => {
         });
       }
     } catch (err) {
-      const errorMsg = err.response?.data?.message || "Failed to update request.";
+      const errorMsg =
+        err.response?.data?.message || "Failed to update request.";
       setError(errorMsg);
       toast.error("Action failed", {
         description: errorMsg,
@@ -132,9 +133,9 @@ const Requests = () => {
         <Card className="border-4 border-muted shadow-xl">
           <CardContent className="py-12 text-center">
             <div className="mb-4 flex justify-center">
-              <img 
-                src="/postbox.png" 
-                alt="Empty postbox" 
+              <img
+                src="/postbox.png"
+                alt="Empty postbox"
                 className="h-24 w-24"
                 style={{ imageRendering: "pixelated" }}
               />
@@ -201,7 +202,7 @@ const Requests = () => {
                   <Button
                     disabled={actingOn === request._id}
                     onClick={() => handleRespond(request._id, "ACCEPTED")}
-                    className="flex-1 border-4 border-border font-mono text-sm font-bold shadow-lg disabled:opacity-50">
+                    className="flex-1 border-4 border-border font-mono text-sm font-bold shadow-lg disabled:opacity-50"
                   >
                     ✓ Accept
                   </Button>
