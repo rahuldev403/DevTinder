@@ -6,6 +6,6 @@ const socketBaseUrl =
 export const createSocket = (token) => {
   return io(socketBaseUrl, {
     withCredentials: true,
-    auth: { token },
+    auth: token ? { token } : undefined,
   });
 };

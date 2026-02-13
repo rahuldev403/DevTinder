@@ -11,7 +11,15 @@ export const chatSocket = (io) => {
   // This middleware runs before every socket connection and verifies the JWT token
   io.use((socket, next) => {
     try {
-      const token = socket.handshake.auth.token; // handshake == connection meta data
+      const tokenFromAuth = socket.handshake.auth?.token;
+      const cookieHeader = socket.handshake.headers?.cookie || "";
+      const accessToken = cookieHeader
+        .split(";")
+        .map((cookie) => cookie.trim())
+        .find((cookie) => cookie.startsWith("accessToken="))
+        ?.split("=")[1];
+      const token = tokenFromAuth || accessToken;
+
       if (!token) {
         return next(new Error("Not authorised"));
       }

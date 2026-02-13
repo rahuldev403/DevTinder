@@ -46,8 +46,23 @@ const Matches = () => {
 
       {isLoading ? (
         <Card>
-          <CardContent className="py-10 text-center text-sm text-muted-foreground">
-            Loading matches...
+          <CardContent className="grid gap-4 py-8 sm:grid-cols-2">
+            {[1, 2, 3, 4].map((item) => (
+              <div
+                key={item}
+                className="rounded-xl border border-border/60 p-4 space-y-3"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="h-12 w-12 rounded-full bg-muted/60 animate-pulse" />
+                  <div className="space-y-2">
+                    <div className="h-3 w-28 rounded bg-muted/60 animate-pulse" />
+                    <div className="h-3 w-16 rounded bg-muted/60 animate-pulse" />
+                  </div>
+                </div>
+                <div className="h-3 w-32 rounded bg-muted/60 animate-pulse" />
+                <div className="h-8 w-28 rounded bg-muted/50 animate-pulse" />
+              </div>
+            ))}
           </CardContent>
         </Card>
       ) : matches.length === 0 ? (

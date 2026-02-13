@@ -1,8 +1,13 @@
 import { OpenAI } from "openai";
 
+const azureEndpoint = (process.env.AZURE_OPENAI_ENDPOINT || "").replace(
+  /\/+$/,
+  "",
+);
+
 const client = new OpenAI({
   apiKey: process.env.AZURE_OPENAI_API_KEY,
-  baseURL: `${process.env.AZURE_OPENAI_ENDPOINT}openai/depolyments/${process.env.AZURE_OPENAI_DEPLOYMENT_NAME}`,
+  baseURL: `${azureEndpoint}/openai/deployments/${process.env.AZURE_OPENAI_DEPLOYMENT_NAME}`,
   defaultQuery: {
     "api-version": process.env.AZURE_OPENAI_API_VERSION,
   },
@@ -42,7 +47,6 @@ const generateCompatibility = async (userA, userB) => {
       { role: "system", content: "You respond only in valid JSON." },
       { role: "user", content: prompt },
     ],
-    temperature: 0.3,
   });
 
   const content = response.choices[0].message.content;

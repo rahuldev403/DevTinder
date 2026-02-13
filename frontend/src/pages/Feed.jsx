@@ -18,6 +18,9 @@ const Feed = () => {
   const [isSwiping, setIsSwiping] = useState(false);
   const [error, setError] = useState("");
   const [totalPages, setTotalPages] = useState(1);
+  const [githubPreview, setGithubPreview] = useState(null);
+  const [githubLoading, setGithubLoading] = useState(false);
+  const [githubError, setGithubError] = useState("");
 
   const currentProfile = useMemo(() => feed[0], [feed]);
 
@@ -48,6 +51,65 @@ const Feed = () => {
     };
   }, [page]);
 
+  useEffect(() => {
+    let isMounted = true;
+    const githubLink = currentProfile?.githubLink;
+    if (!githubLink) {
+      setGithubPreview(null);
+      setGithubError("");
+      return () => {
+        isMounted = false;
+      };
+    }
+
+    const username = githubLink.split("github.com/")[1]?.split("/")[0];
+    if (!username) {
+      setGithubPreview(null);
+      setGithubError("Invalid GitHub link");
+      return () => {
+        isMounted = false;
+      };
+    }
+
+    const controller = new AbortController();
+    setGithubLoading(true);
+    setGithubError("");
+
+    fetch(`https://api.github.com/users/${username}`, {
+      signal: controller.signal,
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to load GitHub profile");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (!isMounted) return;
+        setGithubPreview({
+          name: data.name || data.login,
+          avatar: data.avatar_url,
+          followers: data.followers,
+          following: data.following,
+          repos: data.public_repos,
+          url: data.html_url,
+          bio: data.bio,
+        });
+      })
+      .catch((err) => {
+        if (!isMounted || err.name === "AbortError") return;
+        setGithubError(err.message || "Failed to load GitHub profile");
+      })
+      .finally(() => {
+        if (isMounted) setGithubLoading(false);
+      });
+
+    return () => {
+      isMounted = false;
+      controller.abort();
+    };
+  }, [currentProfile?.githubLink]);
+
   const handleSwipe = async (action) => {
     if (!currentProfile) return;
     setIsSwiping(true);
@@ -75,8 +137,17 @@ const Feed = () => {
 
       {isLoading ? (
         <Card className="mx-auto max-w-xl">
-          <CardContent className="py-10 text-center text-sm text-muted-foreground">
-            Loading developers...
+          <CardContent className="space-y-4 py-10">
+            <div className="flex items-center gap-4">
+              <div className="h-14 w-14 rounded-full bg-muted/60 animate-pulse" />
+              <div className="space-y-2">
+                <div className="h-4 w-32 rounded bg-muted/60 animate-pulse" />
+                <div className="h-3 w-20 rounded bg-muted/60 animate-pulse" />
+              </div>
+            </div>
+            <div className="h-3 w-full rounded bg-muted/60 animate-pulse" />
+            <div className="h-3 w-3/4 rounded bg-muted/60 animate-pulse" />
+            <div className="h-10 w-full rounded bg-muted/40 animate-pulse" />
           </CardContent>
         </Card>
       ) : currentProfile ? (
@@ -128,17 +199,53 @@ const Feed = () => {
               <span>
                 Availability: {formatAvailability(currentProfile.availability)}
               </span>
-              {currentProfile.githubLink ? (
-                <a
-                  href={currentProfile.githubLink}
-                  className="text-primary hover:underline"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  GitHub preview
-                </a>
-              ) : null}
             </div>
+            {currentProfile.githubLink ? (
+              <div className="rounded-xl border border-border/60 bg-muted/30 p-4 text-sm">
+                {githubLoading ? (
+                  <p className="text-muted-foreground">
+                    Loading GitHub preview...
+                  </p>
+                ) : githubError ? (
+                  <p className="text-destructive">{githubError}</p>
+                ) : githubPreview ? (
+                  <div className="flex items-center gap-4">
+                    <div className="h-12 w-12 overflow-hidden rounded-full bg-muted">
+                      <img
+                        src={githubPreview.avatar}
+                        alt={githubPreview.name}
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="font-semibold">
+                          {githubPreview.name}
+                        </span>
+                        <a
+                          href={githubPreview.url}
+                          className="text-primary hover:underline"
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          View GitHub
+                        </a>
+                      </div>
+                      {githubPreview.bio ? (
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          {githubPreview.bio}
+                        </p>
+                      ) : null}
+                      <div className="mt-2 flex flex-wrap gap-3 text-xs text-muted-foreground">
+                        <span>{githubPreview.repos} repos</span>
+                        <span>{githubPreview.followers} followers</span>
+                        <span>{githubPreview.following} following</span>
+                      </div>
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
             <div className="flex flex-wrap gap-3">
               <Button
                 variant="secondary"

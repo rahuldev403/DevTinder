@@ -1,4 +1,7 @@
-import { NavLink } from "react-router-dom";
+import { useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { logout } from "@/api/auth";
 
 const links = [
   { to: "/feed", label: "Feed" },
@@ -8,6 +11,23 @@ const links = [
 ];
 
 const AppShell = ({ title, subtitle, actions, children }) => {
+  const navigate = useNavigate();
+  const [isSigningOut, setIsSigningOut] = useState(false);
+
+  const handleSignOut = async () => {
+    if (isSigningOut) return;
+    setIsSigningOut(true);
+
+    try {
+      await logout();
+    } catch (error) {
+      // Redirect even if logout fails to clear the UI state.
+    } finally {
+      setIsSigningOut(false);
+      navigate("/login");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="border-b border-border/60">
@@ -37,6 +57,14 @@ const AppShell = ({ title, subtitle, actions, children }) => {
                 {link.label}
               </NavLink>
             ))}
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleSignOut}
+              disabled={isSigningOut}
+            >
+              {isSigningOut ? "Signing out..." : "Sign out"}
+            </Button>
           </div>
         </div>
       </header>

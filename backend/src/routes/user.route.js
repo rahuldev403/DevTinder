@@ -29,8 +29,8 @@ userRoute.get("/avatar/signature", protect, getAvatarUploadSignature);
 userRoute.get("/feed", protect, getFeed);
 userRoute.post("/swipe", protect, swipeLimiter, swipeUser);
 userRoute.get("/matches", protect, getMyMatches);
-userRoute.get("/requests", getReceivedRequests);
-userRoute.get("/sentrequests", getSentRequests);
-userRoute.patch("/response", respondToRequest);
+userRoute.get("/requests", protect, getReceivedRequests);
+userRoute.get("/sentrequests", protect, getSentRequests);
+userRoute.patch("/response", protect, respondToRequest);
 
 export default userRoute;

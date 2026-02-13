@@ -9,6 +9,7 @@ import messageRouter from "./routes/message.route.js";
 import http from "http";
 import { Server } from "socket.io";
 import { chatSocket } from "./sockets/chatSocket.js";
+import { setIO } from "./socket.js";
 import rateLimit from "express-rate-limit";
 
 const globalLimiter = rateLimit({
@@ -38,6 +39,7 @@ const io = new Server(server, {
     credentials: true,
   },
 });
+setIO(io);
 chatSocket(io);
 const port = 8000 || process.env.PORT;
 

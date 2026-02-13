@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import AppShell from "@/components/layout/AppShell";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { fetchMessages } from "@/api/messages";
+import { deleteMessage, fetchMessages } from "@/api/messages";
 import { fetchMe } from "@/api/user";
 import { createSocket } from "@/lib/socket";
 
@@ -21,8 +21,7 @@ const Chat = () => {
   const [messageInput, setMessageInput] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
-
-  const token = useMemo(() => localStorage.getItem("accessToken"), []);
+  const [deletingId, setDeletingId] = useState(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -52,14 +51,7 @@ const Chat = () => {
   }, [matchId]);
 
   useEffect(() => {
-    if (!token) {
-      setError(
-        "Real-time chat requires an access token in localStorage (accessToken).",
-      );
-      return undefined;
-    }
-
-    const socket = createSocket(token);
+    const socket = createSocket();
     socketRef.current = socket;
 
     socket.on("connect", () => {
@@ -68,6 +60,10 @@ const Chat = () => {
 
     socket.on("receive-message", (message) => {
       setMessages((prev) => [...prev, message]);
+    });
+
+    socket.on("message-deleted", ({ messageId }) => {
+      setMessages((prev) => prev.filter((msg) => msg._id !== messageId));
     });
 
     socket.on("user-typing", ({ userId }) => {
@@ -94,7 +90,7 @@ const Chat = () => {
     return () => {
       socket.disconnect();
     };
-  }, [matchId, token, currentUserId, otherUserId]);
+  }, [matchId, currentUserId, otherUserId]);
 
   const handleSend = () => {
     const message = messageInput.trim();
@@ -107,6 +103,19 @@ const Chat = () => {
 
     socketRef.current.emit("send-message", { matchId, content: message });
     setMessageInput("");
+  };
+
+  const handleDelete = async (messageId) => {
+    setDeletingId(messageId);
+    setError("");
+    try {
+      await deleteMessage(messageId);
+      setMessages((prev) => prev.filter((msg) => msg._id !== messageId));
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to delete message.");
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   const handleTyping = (value) => {
@@ -148,26 +157,38 @@ const Chat = () => {
               No messages yet. Say hello.
             </p>
           ) : (
-            messages.map((message) => (
-              <div
-                key={message._id}
-                className={`flex ${
-                  message.senderId === currentUserId
-                    ? "justify-end"
-                    : "justify-start"
-                }`}
-              >
+            messages.map((message) => {
+              const isMine = message.senderId === currentUserId;
+              return (
                 <div
-                  className={`max-w-[75%] rounded-2xl px-4 py-2 text-sm ${
-                    message.senderId === currentUserId
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted text-foreground"
+                  key={message._id}
+                  className={`flex items-start gap-2 ${
+                    isMine ? "justify-end" : "justify-start"
                   }`}
                 >
-                  {message.content}
+                  <div
+                    className={`max-w-[75%] rounded-2xl px-4 py-2 text-sm ${
+                      isMine
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted text-foreground"
+                    }`}
+                  >
+                    {message.content}
+                  </div>
+                  {isMine ? (
+                    <button
+                      type="button"
+                      className="text-xs text-muted-foreground hover:text-foreground"
+                      onClick={() => handleDelete(message._id)}
+                      disabled={deletingId === message._id}
+                      aria-label="Delete message"
+                    >
+                      {deletingId === message._id ? "..." : "Delete"}
+                    </button>
+                  ) : null}
                 </div>
-              </div>
-            ))
+              );
+            })
           )}
           {isTyping ? (
             <p className="text-xs text-muted-foreground">Typing...</p>
